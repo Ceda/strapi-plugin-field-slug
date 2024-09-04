@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   useCMEditViewDataManager
 } from "@strapi/helper-plugin";
@@ -14,7 +14,7 @@ import Refresh from "@strapi/icons/Refresh";
 import StrikeThrough from "@strapi/icons/StrikeThrough";
 import styled from "styled-components";
 
-import cyrToLat from "./cyr-to-lat";
+import slugify from '@sindresorhus/slugify';
 
 const Index = ({ name, value, intlLabel, attribute }) => {
   const dateObj = new Date();
@@ -35,46 +35,20 @@ const Index = ({ name, value, intlLabel, attribute }) => {
     ? (data_date = slugify(attribute.options?.kw) + "-" + datetime)
     : (data_date = datetime);
 
-  // console.log("data_date", data_date);
-
   const generateSlug_by_Datetime = () => {
     onChange({ target: { name, value: data_date } });
   };
 
-
   const { modifiedData, onChange } = useCMEditViewDataManager();
-  //const debouncedTargetFieldValue = useDebounce(modifiedData.title, 300);
 
   let data_id;
   let data_title;
-
-
-  // const reg = /^[A-Za-z0-9-_.~[\]/]*$/;
-
-  function slugify(str) {
-    str = str.toLowerCase();
-    return cyrToLat(str)
-      .replace(/[^a-zA-Z0-9]/g, ' ')
-      .trim()
-      .replaceAll(/\s\s+/g, " ")
-      .replaceAll(" ", "-");
-  }
-
-  // useEffect(() => {
-  //   if (Number(modifiedData.id)) {
-  //     attribute.options?.kw
-  //       ? setDataId(slugify(attribute.options?.kw) + "-" + modifiedData.id)
-  //       : setDataId(modifiedData.id);
-  //   }
-  // }, [modifiedData.updatedAt, modifiedData.id]);
 
   if (Number(modifiedData.id)) {
     attribute.options?.kw
       ? (data_id = slugify(attribute.options?.kw) + "-" + modifiedData.id)
       : (data_id = modifiedData.id);
   }
-
-  // console.log("data_id", data_id);
 
   const generateSlug_by_Id = () => {
     onChange({ target: { name, value: data_id } });
@@ -109,12 +83,6 @@ const Index = ({ name, value, intlLabel, attribute }) => {
     }, [modifiedData.id]);
   }
 
-  const clearGeneratedSlug = () => {
-    onChange({ target: { name, value: "" } });
-    // console.log("modifiedData", modifiedData);
-    // console.log("attr: ", attribute);
-  };
-
   return (
     <Stack spacing={1}>
       <FieldLabel>{intlLabel?.defaultMessage}</FieldLabel>
@@ -123,11 +91,6 @@ const Index = ({ name, value, intlLabel, attribute }) => {
         label="slug"
         name="slug"
         value={value || ""}
-        //     onChange={(e) => {
-        //       if (e.target.value.match(/^[A-Za-z0-9-_.~[\]/]*$/)) {
-        //         onChange({ target: { name, value: e.target.value } });
-        //       }
-        // }}
         onChange={(e) =>
           onChange({
             target: { name, value: slugify(e.target.value) },
