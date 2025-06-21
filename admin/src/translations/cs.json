@@ -1,0 +1,19 @@
+{
+  "slug.form.label": "Slug Custom Field",
+  "slug.form.description": "Automaticky generované slug pole",
+  "slug.form.kw": "Výchozí hodnota",
+  "slug.form.kw.label": "Změnit klíčové slovo v zástupném symbolu",
+  "slug.form.pattern": "Vzor slugu",
+  "slug.form.pattern.label": "Vytvořit vzor slugu",
+  "slug.form.pattern.title": "title",
+  "slug.form.pattern.id": "id",
+  "slug.form.pattern.datetime": "datetime",
+  "slug.form.generators": "Dostupné generátory",
+  "slug.form.generators.title.label": "Povolit generátor podle titulu",
+  "slug.form.generators.title.description": "Zobrazit tlačítko pro generování slugu z pole title",
+  "slug.form.generators.pattern.label": "Povolit generátor podle vzoru",
+  "slug.form.generators.pattern.description": "Zobrazit tlačítko pro generování slugu podle vybraného vzoru",
+  "slug.form.behavior": "Chování slugu",
+  "slug.form.dontOverwrite.label": "Nepřepisovat slug u uložených entit",
+  "slug.form.dontOverwrite.description": "Když je povoleno, slug se vygeneruje pouze pro nové entity, ne při úpravě existujících"
+}

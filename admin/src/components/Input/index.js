@@ -35,8 +35,58 @@ const Index = ({ name, value, intlLabel, attribute }) => {
     ? (data_date = slugify(attribute.options?.kw) + "-" + datetime)
     : (data_date = datetime);
 
-  const generateSlug_by_Datetime = () => {
-    onChange({ target: { name, value: data_date } });
+  // Configure available generators based on admin settings
+  const availableGenerators = [];
+
+  // Check if title generator is enabled - default true, but respect admin setting
+  const titleGeneratorEnabled = attribute.options?.enableTitleGenerator !== undefined
+    ? attribute.options.enableTitleGenerator
+    : true; // default to true
+
+  if (titleGeneratorEnabled) {
+    availableGenerators.push('title');
+  }
+
+  // Check if pattern generator is enabled - default false, respect admin setting
+  const patternGeneratorEnabled = attribute.options?.enablePatternGenerator === true;
+
+  if (patternGeneratorEnabled) {
+    availableGenerators.push('pattern');
+  }
+
+  const generateSlug_by_Pattern = () => {
+    // Generate slug based on the selected pattern, not always datetime
+    const pattern = attribute.options?.pattern || 'datetime';
+
+    if (pattern === 'title' && modifiedData.title) {
+      // Generate title-based slug
+      const titleSlug = attribute.options?.kw
+        ? slugify(attribute.options?.kw + "-" + modifiedData.title)
+        : slugify(modifiedData.title);
+      onChange({ target: { name, value: titleSlug } });
+    } else if (pattern === 'id' && modifiedData.id) {
+      // Generate ID-based slug
+      const idSlug = attribute.options?.kw
+        ? slugify(attribute.options?.kw) + "-" + modifiedData.id
+        : modifiedData.id.toString();
+      onChange({ target: { name, value: idSlug } });
+    } else {
+      // Generate fresh datetime slug (default)
+      const freshDateObj = new Date();
+      const freshYear = freshDateObj.getFullYear();
+      const freshMonth = ("0" + (freshDateObj.getMonth() + 1)).slice(-2);
+      const freshDay = ("0" + freshDateObj.getDate()).slice(-2);
+      const freshHours = ("0" + freshDateObj.getHours()).slice(-2);
+      const freshMinutes = ("0" + freshDateObj.getMinutes()).slice(-2);
+      const freshSeconds = ("0" + freshDateObj.getSeconds()).slice(-2);
+
+      const freshDatetime = `${freshYear}-${freshMonth}-${freshDay}-${freshHours}-${freshMinutes}-${freshSeconds}`;
+      const freshData = attribute.options?.kw
+        ? slugify(attribute.options?.kw) + "-" + freshDatetime
+        : freshDatetime;
+
+      onChange({ target: { name, value: freshData } });
+    }
   };
 
   const { modifiedData, onChange } = useCMEditViewDataManager();
@@ -59,28 +109,35 @@ const Index = ({ name, value, intlLabel, attribute }) => {
       ? (data_title = slugify(attribute.options?.kw + "-" + modifiedData.title))
       : (data_title = slugify(modifiedData.title));
   }
-  console.log("data_title", data_title);
   const generateSlug_by_Title = async () => {
-
-    onChange({ target: { name, value: data_title, type: "text" } });
+    // Always generate fresh title-based slug when manually triggered
+    if (modifiedData.title) {
+      const titleSlug = attribute.options?.kw
+        ? slugify(attribute.options?.kw + "-" + modifiedData.title)
+        : slugify(modifiedData.title);
+      onChange({ target: { name, value: titleSlug, type: "text" } });
+    }
   };
 
+  // Check if entity is already saved (has ID) and dontOverwrite option is enabled
+  const isSavedEntity = Boolean(modifiedData.id);
+  const shouldNotOverwrite = attribute.options?.dontOverwrite && isSavedEntity;
 
-  if (value == undefined) {
-    generateSlug_by_Datetime();
+  if (value == undefined && !shouldNotOverwrite) {
+    generateSlug_by_Pattern();
   }
   if (attribute.options?.pattern == "title") {
     useEffect(() => {
-      if (modifiedData.title) {
+      if (modifiedData.title && !shouldNotOverwrite) {
         generateSlug_by_Title();
       }
-    }, [modifiedData.title]);
+    }, [modifiedData.title, shouldNotOverwrite]);
   } else if (attribute.options?.pattern == "id") {
     useEffect(() => {
-      if (modifiedData.id) {
+      if (modifiedData.id && !shouldNotOverwrite) {
         generateSlug_by_Id();
       }
-    }, [modifiedData.id]);
+    }, [modifiedData.id, shouldNotOverwrite]);
   }
 
   return (
@@ -98,15 +155,22 @@ const Index = ({ name, value, intlLabel, attribute }) => {
         }
         endAction={
           <Stack horizontal spacing={2}>
-            <FieldActionWrapper
-              onClick={() => generateSlug_by_Title()}
-              label="regenerate"
-            >
-              <StrikeThrough />
-            </FieldActionWrapper>
-            <FieldActionWrapper onClick={() => generateSlug_by_Datetime()}>
-              <Refresh />
-            </FieldActionWrapper>
+            {availableGenerators.includes('title') && (
+              <FieldActionWrapper
+                onClick={() => generateSlug_by_Title()}
+                label="regenerate by title"
+              >
+                <StrikeThrough />
+              </FieldActionWrapper>
+            )}
+            {availableGenerators.includes('pattern') && (
+              <FieldActionWrapper
+                onClick={() => generateSlug_by_Pattern()}
+                label="regenerate by pattern"
+              >
+                <Refresh />
+              </FieldActionWrapper>
+            )}
           </Stack>
         }
       />
