@@ -35,22 +35,39 @@ const Index = ({ name, value, intlLabel, attribute }) => {
     ? (data_date = slugify(attribute.options?.kw) + "-" + datetime)
     : (data_date = datetime);
 
-  const generateSlug_by_Datetime = () => {
-    // Generate fresh datetime for manual refresh
-    const freshDateObj = new Date();
-    const freshYear = freshDateObj.getFullYear();
-    const freshMonth = ("0" + (freshDateObj.getMonth() + 1)).slice(-2);
-    const freshDay = ("0" + freshDateObj.getDate()).slice(-2);
-    const freshHours = ("0" + freshDateObj.getHours()).slice(-2);
-    const freshMinutes = ("0" + freshDateObj.getMinutes()).slice(-2);
-    const freshSeconds = ("0" + freshDateObj.getSeconds()).slice(-2);
+  const generateSlug_by_Pattern = () => {
+    // Generate slug based on the selected pattern, not always datetime
+    const pattern = attribute.options?.pattern || 'datetime';
 
-    const freshDatetime = `${freshYear}-${freshMonth}-${freshDay}-${freshHours}-${freshMinutes}-${freshSeconds}`;
-    const freshData = attribute.options?.kw
-      ? slugify(attribute.options?.kw) + "-" + freshDatetime
-      : freshDatetime;
+    if (pattern === 'title' && modifiedData.title) {
+      // Generate title-based slug
+      const titleSlug = attribute.options?.kw
+        ? slugify(attribute.options?.kw + "-" + modifiedData.title)
+        : slugify(modifiedData.title);
+      onChange({ target: { name, value: titleSlug } });
+    } else if (pattern === 'id' && modifiedData.id) {
+      // Generate ID-based slug
+      const idSlug = attribute.options?.kw
+        ? slugify(attribute.options?.kw) + "-" + modifiedData.id
+        : modifiedData.id.toString();
+      onChange({ target: { name, value: idSlug } });
+    } else {
+      // Generate fresh datetime slug (default)
+      const freshDateObj = new Date();
+      const freshYear = freshDateObj.getFullYear();
+      const freshMonth = ("0" + (freshDateObj.getMonth() + 1)).slice(-2);
+      const freshDay = ("0" + freshDateObj.getDate()).slice(-2);
+      const freshHours = ("0" + freshDateObj.getHours()).slice(-2);
+      const freshMinutes = ("0" + freshDateObj.getMinutes()).slice(-2);
+      const freshSeconds = ("0" + freshDateObj.getSeconds()).slice(-2);
 
-    onChange({ target: { name, value: freshData } });
+      const freshDatetime = `${freshYear}-${freshMonth}-${freshDay}-${freshHours}-${freshMinutes}-${freshSeconds}`;
+      const freshData = attribute.options?.kw
+        ? slugify(attribute.options?.kw) + "-" + freshDatetime
+        : freshDatetime;
+
+      onChange({ target: { name, value: freshData } });
+    }
   };
 
   const { modifiedData, onChange } = useCMEditViewDataManager();
@@ -73,7 +90,6 @@ const Index = ({ name, value, intlLabel, attribute }) => {
       ? (data_title = slugify(attribute.options?.kw + "-" + modifiedData.title))
       : (data_title = slugify(modifiedData.title));
   }
-  console.log("data_title", data_title);
   const generateSlug_by_Title = async () => {
     // Always generate fresh title-based slug when manually triggered
     if (modifiedData.title) {
@@ -89,7 +105,7 @@ const Index = ({ name, value, intlLabel, attribute }) => {
   const shouldNotOverwrite = attribute.options?.dontOverwrite && isSavedEntity;
 
   if (value == undefined && !shouldNotOverwrite) {
-    generateSlug_by_Datetime();
+    generateSlug_by_Pattern();
   }
   if (attribute.options?.pattern == "title") {
     useEffect(() => {
@@ -126,7 +142,7 @@ const Index = ({ name, value, intlLabel, attribute }) => {
             >
               <StrikeThrough />
             </FieldActionWrapper>
-            <FieldActionWrapper onClick={() => generateSlug_by_Datetime()}>
+            <FieldActionWrapper onClick={() => generateSlug_by_Pattern()}>
               <Refresh />
             </FieldActionWrapper>
           </Stack>
