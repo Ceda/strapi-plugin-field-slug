@@ -114,8 +114,28 @@ export default {
                 ],
               },
             ]
+          },
+          {
+            sectionTitle: {
+              id: 'slug.form.behavior',
+              defaultMessage: 'Slug Behavior',
+            },
+            items: [
+              {
+                intlLabel: {
+                  id: 'slug.form.dontOverwrite.label',
+                  defaultMessage: 'Don\'t overwrite slug for saved entities',
+                },
+                name: 'options.dontOverwrite',
+                type: 'checkbox',
+                description: {
+                  id: 'slug.form.dontOverwrite.description',
+                  defaultMessage: 'When enabled, slug will only be generated for new entities, not when editing existing ones',
+                },
+              },
+            ]
           }
-        
+
         ],
       }
     });
