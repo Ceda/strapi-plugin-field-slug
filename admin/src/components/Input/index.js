@@ -35,6 +35,25 @@ const Index = ({ name, value, intlLabel, attribute }) => {
     ? (data_date = slugify(attribute.options?.kw) + "-" + datetime)
     : (data_date = datetime);
 
+  // Configure available generators based on admin settings
+  const availableGenerators = [];
+
+  // Check if title generator is enabled - default true, but respect admin setting
+  const titleGeneratorEnabled = attribute.options?.enableTitleGenerator !== undefined
+    ? attribute.options.enableTitleGenerator
+    : true; // default to true
+
+  if (titleGeneratorEnabled) {
+    availableGenerators.push('title');
+  }
+
+  // Check if pattern generator is enabled - default false, respect admin setting
+  const patternGeneratorEnabled = attribute.options?.enablePatternGenerator === true;
+
+  if (patternGeneratorEnabled) {
+    availableGenerators.push('pattern');
+  }
+
   const generateSlug_by_Pattern = () => {
     // Generate slug based on the selected pattern, not always datetime
     const pattern = attribute.options?.pattern || 'datetime';
@@ -136,15 +155,22 @@ const Index = ({ name, value, intlLabel, attribute }) => {
         }
         endAction={
           <Stack horizontal spacing={2}>
-            <FieldActionWrapper
-              onClick={() => generateSlug_by_Title()}
-              label="regenerate"
-            >
-              <StrikeThrough />
-            </FieldActionWrapper>
-            <FieldActionWrapper onClick={() => generateSlug_by_Pattern()}>
-              <Refresh />
-            </FieldActionWrapper>
+            {availableGenerators.includes('title') && (
+              <FieldActionWrapper
+                onClick={() => generateSlug_by_Title()}
+                label="regenerate by title"
+              >
+                <StrikeThrough />
+              </FieldActionWrapper>
+            )}
+            {availableGenerators.includes('pattern') && (
+              <FieldActionWrapper
+                onClick={() => generateSlug_by_Pattern()}
+                label="regenerate by pattern"
+              >
+                <Refresh />
+              </FieldActionWrapper>
+            )}
           </Stack>
         }
       />

@@ -117,6 +117,39 @@ export default {
           },
           {
             sectionTitle: {
+              id: 'slug.form.generators',
+              defaultMessage: 'Available Generators',
+            },
+            items: [
+              {
+                intlLabel: {
+                  id: 'slug.form.generators.title.label',
+                  defaultMessage: 'Enable Title Generator',
+                },
+                name: 'options.enableTitleGenerator',
+                type: 'checkbox',
+                default: true,
+                description: {
+                  id: 'slug.form.generators.title.description',
+                  defaultMessage: 'Show button to generate slug from title field',
+                },
+              },
+              {
+                intlLabel: {
+                  id: 'slug.form.generators.pattern.label',
+                  defaultMessage: 'Enable Pattern Generator',
+                },
+                name: 'options.enablePatternGenerator',
+                type: 'checkbox',
+                description: {
+                  id: 'slug.form.generators.pattern.description',
+                  defaultMessage: 'Show button to generate slug based on selected pattern',
+                },
+              },
+            ]
+          },
+          {
+            sectionTitle: {
               id: 'slug.form.behavior',
               defaultMessage: 'Slug Behavior',
             },
